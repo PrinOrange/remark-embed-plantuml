@@ -23,20 +23,20 @@ interface PlantUMLOptions {
   timeout?: number;
 }
 
-function addOptionToArgs(
-  args: string[],
-  key: string,
-  value: any,
-  handlers: Record<string, (value: any) => string>,
-) {
-  if (value !== undefined && handlers[key]) {
-    args.push(handlers[key](value));
-  }
-}
-
 function transformOptionsToArguments(options: PlantUMLOptions): string[] {
   const defaultArgs = ['-jar', PLANTUML_BINFILE_PATH];
   const args = [...defaultArgs];
+
+  function addOptionToArgs(
+    args: string[],
+    key: string,
+    value: any,
+    handlers: Record<string, (value: any) => string>,
+  ) {
+    if (value !== undefined && handlers[key]) {
+      args.push(handlers[key](value));
+    }
+  }
 
   const optionHandlers: Record<string, (value: any) => string> = {
     format: (value: string) => `-t${value}`,
@@ -85,13 +85,9 @@ function callPlantUML(plantUmlCode: string, args: string[]): Promise<string> {
   });
 }
 
-const defaultOptions: PlantUMLOptions = {
-  format: 'png',
-  charset: 'utf-8',
-};
-export default function remarkPlantuml(options: PlantUMLOptions = {}) {
-  const opts: PlantUMLOptions = {...defaultOptions, ...options};
-  const plantUmlArguments = transformOptionsToArguments(opts);
+export default function remarkPlantuml(opts: PlantUMLOptions = {}) {
+  const options: PlantUMLOptions = {format: 'png', charset: 'utf-8', ...opts};
+  const plantUmlArguments = transformOptionsToArguments(options);
 
   return async function transformer(mdast: Node) {
     const promises: Promise<void>[] = [];
