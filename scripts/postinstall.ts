@@ -74,6 +74,7 @@ async function downloadAndExtractJre() {
     fs.mkdirSync(JreDir, {recursive: true});
 
     console.log('Downloading JRE...');
+    // @ts-ignore
     await njre.install(17, {installPath: JreDir});
 
     const extractedJreDir = fs

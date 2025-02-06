@@ -16,7 +16,7 @@
     "unified"
   ],
   "scripts": {
-    "build": "tsx ./scripts/build.ts",
+    "build": "tsc",
     "format": "npx prettier . --write",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
