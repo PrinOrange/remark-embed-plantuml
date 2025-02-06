@@ -1,0 +1,2 @@
+
+The PlantUML requires the JRE for runtime, but you need not install the JRE manually. This package has integrated JRE and it will execute PlantUML callings automatically, it realized out-of-the-box use.
