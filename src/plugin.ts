@@ -75,11 +75,12 @@ function callPlantUML(plantUmlCode: string, args: string[]): Promise<string> {
       resolve(base64Code);
     });
 
-    plantuml.on('error', reject);
+    plantuml.on('error', (err) => {
+      reject(new Error(`Failed to spawn PlantUML process: ${err.message}`));
+    });
     plantuml.on('close', (code) => {
       if (code !== 0) {
-        console.log(`PlantUML process exited with code ${code}`);
-        return;
+        reject(new Error(`PlantUML process exited with code ${code}`));
       }
     });
   });
