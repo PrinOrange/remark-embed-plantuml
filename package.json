@@ -16,7 +16,8 @@
     "unified"
   ],
   "scripts": {
-    "build":"tsx ./scripts/build.ts",
+    "build": "tsx ./scripts/build.ts",
+    "format": "npx prettier . --write",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -29,9 +30,13 @@
   "description": "A remark plugin that allows you render the PlantUML in the markdown document.",
   "devDependencies": {
     "@types/node": "^22.13.1",
+    "prettier": "^3.4.2",
+    "prettier-plugin-organize-imports": "^4.1.0",
     "tsx": "^4.19.2"
   },
   "dependencies": {
+    "@types/mdast": "^4.0.4",
+    "@types/unist": "^3.0.3",
     "njre": "^1.4.0",
     "unist-util-visit": "^5.0.0"
   }
