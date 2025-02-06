@@ -1,3 +1,11 @@
 {
-  "cSpell.words": ["mdast", "njre", "plantuml"]
+  "cSpell.words": [
+    "darkmode",
+    "failfast",
+    "mdast",
+    "nbthread",
+    "njre",
+    "plantuml",
+    "stdrpt"
+  ]
 }

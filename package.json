@@ -18,7 +18,8 @@
   "scripts": {
     "build": "tsc",
     "format": "npx prettier . --write",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "tsx ./scripts/postinstall.ts",
+    "test": "pnpm run build && node --test ./test/*.test.js"
   },
   "author": "",
   "repository": {
@@ -37,6 +38,7 @@
   "dependencies": {
     "@types/mdast": "^4.0.4",
     "@types/unist": "^3.0.3",
+    "axios": "^1.7.9",
     "njre": "^1.4.0",
     "unist-util-visit": "^5.0.0"
   }

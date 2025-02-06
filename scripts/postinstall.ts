@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as fs from 'fs';
 import njre from 'njre';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
+import {fileURLToPath} from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,7 +46,7 @@ async function cleanJBinFileDirectory() {
 
 async function downloadPlantUMLBinFile(): Promise<void> {
   console.log('Downloading PlantUML...');
-  fs.mkdirSync(binFileDir, { recursive: true });
+  fs.mkdirSync(binFileDir, {recursive: true});
 
   try {
     const response = await axios.get(plantUmlDownloadUrl, {

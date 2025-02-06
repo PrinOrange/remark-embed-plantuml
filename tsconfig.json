@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "Node16",
+    "module": "NodeNext",
     "target": "ES6",
     "declaration": true,
     "outDir": "./dist",
@@ -10,6 +10,6 @@
     "skipLibCheck": true,
     "strict": true
   },
-  "include": ["src/**/*", "__tests__/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "__tests__/**/*"]
 }
