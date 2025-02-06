@@ -1,8 +1,8 @@
+import axios from 'axios';
 import * as fs from 'fs';
-import * as https from 'https';
 import njre from 'njre';
 import * as path from 'path';
-import {fileURLToPath} from 'url';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,29 +44,40 @@ async function cleanJBinFileDirectory() {
   }
 }
 
-async function downloadPlantUMLBinFile() {
+async function downloadPlantUMLBinFile(): Promise<void> {
   console.log('Downloading PlantUML...');
-  fs.mkdirSync(binFileDir, {recursive: true});
-  return new Promise<void>((resolve, reject) => {
+  fs.mkdirSync(binFileDir, { recursive: true });
+
+  try {
+    const response = await axios.get(plantUmlDownloadUrl, {
+      responseType: 'stream',
+      maxRedirects: 5,
+    });
+
+    if (!response.data || response.headers['content-length'] === '0') {
+      throw new Error('Received empty file (Content-Length: 0)');
+    }
+
     const fileStream = fs.createWriteStream(binFilePath);
-    https
-      .get(plantUmlDownloadUrl, (response) => {
-        if (response.statusCode == null || response.statusCode >= 400) {
-          reject(new Error(`Failed to download file: ${response.statusCode}`));
-          return;
-        }
-        response.pipe(fileStream);
-        fileStream.on('finish', () => {
-          fileStream.close();
-          console.log(`Downloaded PlantUML: ${binFilePath}`);
-          resolve();
-        });
-      })
-      .on('error', (err) => {
+    response.data.pipe(fileStream);
+
+    return new Promise<void>((resolve, reject) => {
+      fileStream.on('finish', () => {
+        console.log(`Downloaded PlantUML: ${binFilePath}`);
+        resolve();
+      });
+
+      fileStream.on('error', (err) => {
+        console.error('File stream error:', err);
         fs.unlinkSync(binFilePath);
         reject(err);
       });
-  });
+    });
+  } catch (error) {
+    console.error('Download failed:', error);
+    fs.unlinkSync(binFilePath);
+    throw error;
+  }
 }
 
 async function downloadAndExtractJre() {
