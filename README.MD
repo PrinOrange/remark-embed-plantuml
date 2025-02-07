@@ -1,38 +1,39 @@
 # Remark Embed PlantUML
 
-> ⚠ **NOTE:** \
-> This package is on the early development stage and it needs more user-side fallbacks and investigations. Please [submit your issue](https://github.com/PrinOrange/remark-embed-plantuml/issues) if you have any questions you have encountered.
+> ⚠ **NOTE:**  
+> This package is in the early stages of development and requires user feedback and further investigation. If you encounter any issues, please [submit an issue](https://github.com/PrinOrange/remark-embed-plantuml/issues).
 
-This is a Remark Plugin that allows you embed PlantUML graph in your markdown document. It will read all PUML code blocks in markdown and transform them into images of Base64 Encodings on your local machine.
+This is a **Remark** plugin that allows you to embed **PlantUML** diagrams directly in your markdown documents. It scans all **PlantUML** code blocks in the markdown file and converts them into **Base64-encoded** images locally.
 
-The PlantUML requires the JRE for runtime, but you need not install the JRE manually. This package has integrated JRE and it will execute PlantUML callings automatically, it realized out-of-the-box use.
+PlantUML requires a **Java Runtime Environment (JRE)**, but you do **not** need to install it manually. This package includes an integrated JRE and automatically executes PlantUML commands, making it easy to use out of the box.
 
-**NOTE:** This package comes with own Java JRE and PlantUML Jar file so that it could only running on Node.js environment. So it may be invalid if you run them on Browser/Electron Renderer. Also because the Java JRE and binary files can not be recognized by building tools like Webpack, Vite, so it does not work if you reference this package but build your project.
+> **Note:** Since this package includes a bundled Java JRE and PlantUML JAR file, it is only compatible with a **Node.js** environment. It will not work in **browsers** or **Electron render processes**. Additionally, because building tools like **Webpack** and **Vite** cannot recognize Java binaries, this package will not function properly if bundled into a project.
+
+## Installation
+
+Install this package using npm:
+
+```bash
+npm install remark-embed-plantuml
+```
 
 ## Usage
 
-Install this package
-
-```bash
-npm i remark-embed-plantuml
-```
-
-We take this code for example
+Consider the following markdown file:
 
 ```plaintext
 # Hello, PlantUML
 
-Here is a simple PlantUML Graph
+Here is a simple PlantUML diagram:
 
 \`\`\`plantuml
 @startuml
 Alice -> Bob: test
 @enduml
 \`\`\`
-
 ```
 
-And take it into your code,
+Now, integrate this plugin into your code:
 
 ```javascript
 import remarkEmbedPlantUml from 'remark-embed-plantuml';
@@ -41,80 +42,82 @@ import remarkStringify from 'remark-stringify';
 import {unified} from 'unified';
 import {readFile} from 'node:fs/promises';
 
-await (async (t) => {
+(async () => {
   const processor = unified()
     .use(remarkParse)
-    .use(remarkPlantUml, {format: 'png', stdrpt: 2, darkmode: true})
+    .use(remarkEmbedPlantUml, {format: 'png', stdrpt: 2, darkmode: true})
     .use(remarkStringify);
+
   const transformed = await processor.process(await readFile('doc.md'));
-  const output = transformed.toString();
-  console.log(output);
+  console.log(transformed.toString());
 })();
 ```
 
-It will outputs:
+### Output:
 
 ```markdown
 # Hello, PlantUML
 
-Here is a simple PlantUML Graph
+Here is a simple PlantUML diagram:
 
-![PlantUML Image](data:image/png;base64,xxxxxxxxxx....)
+![PlantUML Diagram](data:image/png;base64,xxxxxxxxxx....)
 ```
 
 ## API
 
-This package is `ESM` only and has a default export `remarkEmbedPlantUML`. You could integrate this plugin with unified.js.
+This package is **ESM-only** and provides a default export: `remarkEmbedPlantUML`. You can integrate it with **unified.js**.
 
 ### `unified().use(remarkEmbedPlantUML, options?)`
 
-This plugin supports [partial arguments of PlantUML](https://plantuml.com/en/command-line) and it calls the PlantUML by CLI pipe way.
+This plugin supports [PlantUML command-line arguments](https://plantuml.com/en/command-line) and executes **PlantUML** via a CLI pipe.
+
+### Options
 
 #### `format?: 'png' | 'svg'`
 
-The output format, default to `PNG`, only `SVG` or `PNG` is supported, and finally it will rendered in base64 encoding.
+Specifies the output format. Defaults to `'png'`. Only `'svg'` and `'png'` are supported. The result is embedded as a **Base64-encoded** image.
 
 #### `theme?: string`
 
-The theme that you want to applied. Refer to [official theme description](https://plantuml.com/en/theme) for more details.
+Specifies the **theme** for the diagram. See the [official theme documentation](https://plantuml.com/en/theme) for available options.
 
 #### `darkmode?: boolean`
 
-Use dark mode for diagrams.
+Enables **dark mode** for diagrams.
 
 #### `stdrpt?: '' | 1 | 2`
 
-Using the `-stdrpt` (standard report) option, you can change the format of the error output of your PlantUML scripts. See [description of stdrpt](https://plantuml.com/en/command-line).
+Controls the error output format using the `-stdrpt` option. See [PlantUML command-line documentation](https://plantuml.com/en/command-line) for details.
 
 #### `verbose?: boolean`
 
-Have log information.
+Enables logging output.
 
 #### `quiet?: boolean`
 
-To NOT print error message into the console.
+Suppresses error messages in the console.
 
 #### `timeout?: number`
 
-Processing timeout in (N) seconds. Defaults to 15 minutes (900 seconds).
+Sets the **processing timeout** in seconds. Defaults to **900 seconds (15 minutes)**.
 
-This project is under long-term maintaining and if you need more arguments support, [please submit your issue](https://github.com/PrinOrange/remark-plantuml) to tell me.
+If you need support for additional arguments, [submit an issue](https://github.com/PrinOrange/remark-plantuml) to request it.
 
 ## Compatibility
 
-This project is compatible with Node.js 18 or greater.
+This package requires **Node.js 18** or later.
 
-- JRE Version: 17.0.14+7
-- PlantUML Version: 1.2025.0
+- **Bundled JRE Version:** 17.0.14+7
+- **PlantUML Version:** 1.2025.0
 
-## Related Projects
+## 🔗 Related Projects
 
 - [PlantUML](https://github.com/plantuml/plantuml)
 
 ## Contributing
 
-Test fixtures are generated and verified using Linux. Rendering on other platforms may yield slightly different results. Don’t worry about adding new fixtures, but don’t update existing ones that cause CI to fail. Furthermore see my global [contributing guidelines](./CONTRIBUTION.MD).
+Test fixtures are generated and verified using **Linux**. Rendering results may slightly differ across platforms. If adding new test cases, don’t modify existing ones that cause CI failures. For general contribution guidelines, see [CONTRIBUTING.md](./CONTRIBUTION.MD).
 
-## LICENSE
+## License
 
 [MIT](./LICENSE.MD) © [但为君故](https://github.com/PrinOrange)
