@@ -23,7 +23,8 @@
     "build": "tsc",
     "format": "prettier . --write",
     "postinstall": "tsx ./scripts/download-java.ts",
-    "test": "pnpm run build && tsx --test ./__tests__/*.test.ts"
+    "test": "pnpm run build && tsx --test ./__tests__/*.test.ts",
+    "prepublish": "pnpm run format && pnpm run build"
   },
   "author": "",
   "repository": {
