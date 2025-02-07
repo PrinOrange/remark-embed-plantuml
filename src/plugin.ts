@@ -119,7 +119,6 @@ const remarkPlantUml: unified.Plugin<[PlantUMLOptions], mdast.Root> = (
 
   return async function transformer(tree) {
     const promises: Promise<void>[] = [];
-    console.log(JSON.stringify(tree));
     visit(tree, 'code', (node, index, parent) => {
       const codeNode = node;
       if (
@@ -128,7 +127,6 @@ const remarkPlantUml: unified.Plugin<[PlantUMLOptions], mdast.Root> = (
         parent &&
         index !== null
       ) {
-        console.log(JSON.stringify(parent));
         promises.push(applyChange(codeNode as Code, index!, parent));
       }
     });
