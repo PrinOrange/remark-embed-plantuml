@@ -110,7 +110,7 @@ This package requires **Node.js 18** or later.
 - **Bundled JRE Version:** 17.0.14+7
 - **PlantUML Version:** 1.2025.0
 
-## 🔗 Related Projects
+## Related Projects
 
 - [PlantUML](https://github.com/plantuml/plantuml)
 
