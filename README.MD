@@ -1,5 +1,8 @@
 # Remark Embed PlantUML
 
+> ⚠ **NOTE:**  \
+> This package is on the early development stage and it needs more user-side fallbacks and investigations. Please [submit your issue](https://github.com/PrinOrange/remark-embed-plantuml/issues) if you have any questions you have encountered.
+
 This is a Remark Plugin that allows you embed PlantUML graph in your markdown document. It will read all PUML code blocks in markdown and transform them into images of Base64 Encodings on your local machine.
 
 The PlantUML requires the JRE for runtime, but you need not install the JRE manually. This package has integrated JRE and it will execute PlantUML callings automatically, it realized out-of-the-box use.
