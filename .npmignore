@@ -1,2 +1,7 @@
+node_modules
+__tests__
+
 dist/jre
 dist/bin
+
+.vscode
