@@ -1,5 +1,5 @@
 {
-  "name": "remark-plantuml",
+  "name": "remark-embed-plantuml",
   "version": "0.0.1-alpha",
   "main": "./dist/index.js",
   "type": "module",
