@@ -29,6 +29,24 @@ test('Basic PNG', async (t) => {
   assert.equal(expectContent, actualContent);
 });
 
+test('Basic SVG', async (t) => {
+  const inputContent = await fs.readFileSync(
+    path.resolve(__dirname, './cases/basic-svg/input.md'),
+    'utf-8',
+  );
+  const expectContent = await fs.readFileSync(
+    path.resolve(__dirname, './cases/basic-svg/expect.md'),
+    'utf-8',
+  );
+  const processor = unified()
+    .use(remarkParse)
+    .use(remarkPlantUml, {format: 'svg'})
+    .use(remarkStringify);
+  const transformed = await processor.process(inputContent);
+  const actualContent = transformed.toString();
+  assert.equal(expectContent, actualContent);
+});
+
 test('Dark PNG', async (t) => {
   const inputContent = await fs.readFileSync(
     path.resolve(__dirname, './cases/dark-png/input.md'),
@@ -41,6 +59,24 @@ test('Dark PNG', async (t) => {
   const processor = unified()
     .use(remarkParse)
     .use(remarkPlantUml, {format: 'png', darkmode: true})
+    .use(remarkStringify);
+  const transformed = await processor.process(inputContent);
+  const actualContent = transformed.toString();
+  assert.equal(expectContent, actualContent);
+});
+
+test('Dark SVG', async (t) => {
+  const inputContent = await fs.readFileSync(
+    path.resolve(__dirname, './cases/dark-svg/input.md'),
+    'utf-8',
+  );
+  const expectContent = await fs.readFileSync(
+    path.resolve(__dirname, './cases/dark-svg/expect.md'),
+    'utf-8',
+  );
+  const processor = unified()
+    .use(remarkParse)
+    .use(remarkPlantUml, {format: 'svg', darkmode: true})
     .use(remarkStringify);
   const transformed = await processor.process(inputContent);
   const actualContent = transformed.toString();
