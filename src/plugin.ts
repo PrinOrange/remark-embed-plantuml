@@ -23,10 +23,10 @@ interface PlantUMLOptions {
 }
 
 function transformOptionsToArguments(options: PlantUMLOptions): string[] {
-  const defaultArgs = ['-jar', PLANTUML_BINFILE_PATH];
-  const args = [...defaultArgs];
+  const defaultArguments = ['-jar', PLANTUML_BINFILE_PATH];
+  const args = [...defaultArguments];
 
-  function addOptionToArgs(
+  function addOptionToArguments(
     args: string[],
     key: string,
     value: any,
@@ -49,85 +49,89 @@ function transformOptionsToArguments(options: PlantUMLOptions): string[] {
   };
 
   Object.entries(options).forEach(([key, value]) => {
-    addOptionToArgs(args, key, value, optionHandlers);
+    addOptionToArguments(args, key, value, optionHandlers);
   });
 
   args.push('-pipe');
   return args;
 }
 
-function callPlantUML(plantUmlCode: string, args: string[]): Promise<string> {
+function callPlantUML(plantUmlCode: string, args: string[]): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const plantuml = child_process.spawn(JAVA_JRE_BINFILE_PATH, args, {
+    const plantUmlProcess = child_process.spawn(JAVA_JRE_BINFILE_PATH, args, {
       stdio: ['pipe', 'pipe', process.stderr],
     });
 
     const chunks: Buffer[] = [];
 
-    plantuml.stdin.write(plantUmlCode);
-    plantuml.stdin.end();
+    plantUmlProcess.stdin.write(plantUmlCode);
+    plantUmlProcess.stdin.end();
 
-    plantuml.stdout.on('data', (chunk) => {
+    plantUmlProcess.stdout.on('data', (chunk) => {
       chunks.push(chunk);
     });
 
-    plantuml.on('error', (err) => {
+    plantUmlProcess.on('error', (err) => {
       reject(new Error(`Failed to spawn PlantUML process: ${err.message}`));
     });
 
-    plantuml.on('close', (code) => {
+    plantUmlProcess.on('close', (code) => {
       if (code !== 0) {
         reject(new Error(`PlantUML process exited with code ${code}`));
       } else {
-        resolve(Buffer.concat(chunks).toString('base64'));
+        resolve(Buffer.concat(chunks));
       }
     });
   });
 }
 
-const remarkPlantUml: unified.Plugin<[PlantUMLOptions], mdast.Root> = (
+const remarkPlantUml: unified.Plugin<[PlantUMLOptions], mdast.Root> = function (
   opts: PlantUMLOptions = {},
-) => {
+) {
   const options: PlantUMLOptions = {format: 'png', ...opts};
   const plantUmlArguments = transformOptionsToArguments(options);
 
   async function applyChange(codeNode: Code, index: number, parent: any) {
-    {
-      try {
-        const base64Data = await callPlantUML(
-          codeNode.value!,
-          plantUmlArguments,
-        );
-        parent.children[index] = {
-          type: 'paragraph',
-          children: [
-            {
-              type: 'image',
-              url: `data:image/${opts.format};base64,${base64Data}`,
-              alt: 'PlantUML Diagram',
-            },
-          ],
-        } as mdast.Paragraph;
-      } catch (error: any) {
-        parent.children[index] = {
-          type: 'text',
-          value: `Error rendering PlantUML: ${error.message}`,
-        };
-      }
+    try {
+      const imageBase64 = (
+        await callPlantUML(codeNode.value!, plantUmlArguments)
+      ).toString('base64');
+
+      const formatMap: Record<string, string> = {
+        png: 'png',
+        svg: 'svg+xml',
+      };
+
+      const base64Format = formatMap[opts.format ?? 'png'] ?? 'png';
+
+      parent.children[index] = {
+        type: 'paragraph',
+        children: [
+          {
+            type: 'image',
+            url: `data:image/${base64Format};base64,${imageBase64}`,
+            alt: 'PlantUML Diagram',
+          },
+        ],
+      } as mdast.Paragraph;
+    } catch (error: any) {
+      parent.children[index] = {
+        type: 'text',
+        value: `Error rendering PlantUML: ${error.message}`,
+      };
     }
   }
 
   return async function transformer(tree) {
     const promises: Promise<void>[] = [];
     visit(tree, 'code', (node, index, parent) => {
-      const codeNode = node;
       if (
-        codeNode.type === 'code' &&
-        (codeNode as Code).lang?.toLowerCase() === 'plantuml' &&
+        node.type === 'code' &&
+        node.lang?.toLowerCase() === 'plantuml' &&
         parent &&
-        index !== null
+        index
       ) {
-        promises.push(applyChange(codeNode as Code, index!, parent));
+        promises.push(applyChange(node, index, parent));
       }
     });
     await Promise.all(promises);
