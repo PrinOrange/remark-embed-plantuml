@@ -9,11 +9,14 @@ const __dirname = path.dirname(__filename);
 
 const JreDir = path.resolve(__dirname, '../dist/jre');
 
-const binFilename = 'plantuml.jar';
-const binFileDir = path.resolve(__dirname, '../dist/bin');
-const binFilePath = path.resolve(binFileDir, binFilename);
+const plantUmlBinFilename = 'plantuml.jar';
+const plantUmlBinFileDir = path.resolve(__dirname, '../dist/bin');
+const plantUmlBinFilePath = path.resolve(
+  plantUmlBinFileDir,
+  plantUmlBinFilename,
+);
 
-const plantUmlDownloadUrl =
+const plantUmlBinFileDownloadUrl =
   'https://github.com/plantuml/plantuml/releases/download/v1.2025.0/plantuml-mit-1.2025.0.jar';
 
 async function cleanJreDirectory() {
@@ -31,7 +34,7 @@ async function cleanJreDirectory() {
 }
 
 async function cleanJBinFileDirectory() {
-  if (!fs.existsSync(binFilePath)) return;
+  if (!fs.existsSync(plantUmlBinFilePath)) return;
   console.log('Cleaning PlantUML Binary File directory...');
 
   try {
@@ -46,10 +49,10 @@ async function cleanJBinFileDirectory() {
 
 async function downloadPlantUMLBinFile(): Promise<void> {
   console.log('Downloading PlantUML...');
-  fs.mkdirSync(binFileDir, {recursive: true});
+  fs.mkdirSync(plantUmlBinFileDir, {recursive: true});
 
   try {
-    const response = await axios.get(plantUmlDownloadUrl, {
+    const response = await axios.get(plantUmlBinFileDownloadUrl, {
       responseType: 'stream',
       maxRedirects: 5,
     });
@@ -58,24 +61,24 @@ async function downloadPlantUMLBinFile(): Promise<void> {
       throw new Error('Received empty file (Content-Length: 0)');
     }
 
-    const fileStream = fs.createWriteStream(binFilePath);
+    const fileStream = fs.createWriteStream(plantUmlBinFilePath);
     response.data.pipe(fileStream);
 
     return new Promise<void>((resolve, reject) => {
       fileStream.on('finish', () => {
-        console.log(`Downloaded PlantUML: ${binFilePath}`);
+        console.log(`Downloaded PlantUML: ${plantUmlBinFilePath}`);
         resolve();
       });
 
       fileStream.on('error', (err) => {
         console.error('File stream error:', err);
-        fs.unlinkSync(binFilePath);
+        fs.unlinkSync(plantUmlBinFilePath);
         reject(err);
       });
     });
   } catch (error) {
     console.error('Download failed:', error);
-    fs.unlinkSync(binFilePath);
+    fs.unlinkSync(plantUmlBinFilePath);
     throw error;
   }
 }

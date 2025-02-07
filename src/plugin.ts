@@ -1,7 +1,6 @@
 import * as child_process from 'child_process';
 import type {Code, Image} from 'mdast';
 import * as path from 'path';
-import {PassThrough} from 'stream';
 import type {Node} from 'unist';
 import {visit} from 'unist-util-visit';
 import {fileURLToPath} from 'url';
@@ -16,7 +15,6 @@ interface PlantUMLOptions {
   format?: 'png' | 'svg';
   theme?: string;
   darkmode?: boolean;
-  charset?: string;
   stdrpt?: '' | 1 | 2;
   verbose?: boolean;
   quiet?: boolean;
@@ -43,7 +41,7 @@ function transformOptionsToArguments(options: PlantUMLOptions): string[] {
     theme: (value: string) => `-theme ${value}`,
     darkmode: () => '-darkmode',
     charset: (value: string) => `-charset ${value}`,
-    stdrpt: (value: '' | 1 | 2) => `-stdrpt ${value}`,
+    stdrpt: (value: '' | 1 | 2) => `-stdrpt${value}`,
     verbose: () => '-verbose',
     quiet: () => '-quiet',
     timeout: (value: number) => `-timeout ${value}`,
@@ -63,66 +61,68 @@ function callPlantUML(plantUmlCode: string, args: string[]): Promise<string> {
       stdio: ['pipe', 'pipe', process.stderr],
     });
 
-    const pipeStream = new PassThrough();
+    const chunks: Buffer[] = [];
 
     plantuml.stdin.write(plantUmlCode);
     plantuml.stdin.end();
 
-    plantuml.stdout.pipe(pipeStream);
-
-    pipeStream.on('data', (chunk) => {
-      const base64Code = chunk.toString('base64');
-      resolve(base64Code);
+    plantuml.stdout.on('data', (chunk) => {
+      chunks.push(chunk);
     });
 
     plantuml.on('error', (err) => {
       reject(new Error(`Failed to spawn PlantUML process: ${err.message}`));
     });
+
     plantuml.on('close', (code) => {
       if (code !== 0) {
         reject(new Error(`PlantUML process exited with code ${code}`));
+      } else {
+        resolve(Buffer.concat(chunks).toString('base64'));
       }
     });
   });
 }
 
 export default function remarkPlantuml(opts: PlantUMLOptions = {}) {
-  const options: PlantUMLOptions = {format: 'png', charset: 'utf-8', ...opts};
+  const options: PlantUMLOptions = {format: 'png', ...opts};
   const plantUmlArguments = transformOptionsToArguments(options);
+
+  async function applyChange(codeNode: Code, index: number, parent: any) {
+    {
+      try {
+        const base64Data = await callPlantUML(
+          codeNode.value!,
+          plantUmlArguments,
+        );
+
+        parent.children[index] = {
+          type: 'image',
+          url: `data:image/${opts.format};base64,${base64Data}`,
+          alt: 'PlantUML Diagram',
+        } as Image;
+      } catch (error: any) {
+        parent.children[index] = {
+          type: 'text',
+          value: `Error rendering PlantUML: ${error.message}`,
+        };
+      }
+    }
+  }
 
   return async function transformer(mdast: Node) {
     const promises: Promise<void>[] = [];
     visit(mdast, 'code', (node, index: number, parent: any) => {
-      const codeNode = node as Code;
+      const codeNode = node as Node;
       if (
-        codeNode.lang?.toLowerCase() === 'plantuml' &&
+        codeNode.type === 'code' &&
+        (codeNode as Code).lang?.toLowerCase() === 'plantuml' &&
         parent &&
         index !== null
       ) {
-        promises.push(
-          (async () => {
-            try {
-              const base64Data = await callPlantUML(
-                codeNode.value!,
-                plantUmlArguments,
-              );
-
-              parent.children[index] = {
-                type: 'image',
-                url: `data:image/${opts.format};base64,${base64Data}`,
-                alt: 'PlantUML Diagram',
-              } as Image;
-            } catch (error: any) {
-              parent.children[index] = {
-                type: 'text',
-                value: `Error rendering PlantUML: ${error.message}`,
-              };
-            }
-          })(),
-        );
+        promises.push(applyChange(codeNode as Code, index, parent));
       }
     });
-
     await Promise.all(promises);
   };
 }
