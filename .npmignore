@@ -5,3 +5,4 @@ dist/jre
 dist/bin
 
 .vscode
+*.temp.*
