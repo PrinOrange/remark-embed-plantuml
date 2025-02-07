@@ -1,7 +1,8 @@
 import * as child_process from 'child_process';
-import type {Code, Image} from 'mdast';
+import type * as mdast from 'mdast';
+import type {Code} from 'mdast';
 import * as path from 'path';
-import type {Node} from 'unist';
+import type * as unified from 'unified';
 import {visit} from 'unist-util-visit';
 import {fileURLToPath} from 'url';
 
@@ -84,7 +85,9 @@ function callPlantUML(plantUmlCode: string, args: string[]): Promise<string> {
   });
 }
 
-export default function remarkPlantuml(opts: PlantUMLOptions = {}) {
+const remarkPlantUml: unified.Plugin<[PlantUMLOptions], mdast.Root> = (
+  opts: PlantUMLOptions = {},
+) => {
   const options: PlantUMLOptions = {format: 'png', ...opts};
   const plantUmlArguments = transformOptionsToArguments(options);
 
@@ -95,12 +98,16 @@ export default function remarkPlantuml(opts: PlantUMLOptions = {}) {
           codeNode.value!,
           plantUmlArguments,
         );
-
         parent.children[index] = {
-          type: 'image',
-          url: `data:image/${opts.format};base64,${base64Data}`,
-          alt: 'PlantUML Diagram',
-        } as Image;
+          type: 'paragraph',
+          children: [
+            {
+              type: 'image',
+              url: `data:image/${opts.format};base64,${base64Data}`,
+              alt: 'PlantUML Diagram',
+            },
+          ],
+        } as mdast.Paragraph;
       } catch (error: any) {
         parent.children[index] = {
           type: 'text',
@@ -110,19 +117,23 @@ export default function remarkPlantuml(opts: PlantUMLOptions = {}) {
     }
   }
 
-  return async function transformer(mdast: Node) {
+  return async function transformer(tree) {
     const promises: Promise<void>[] = [];
-    visit(mdast, 'code', (node, index: number, parent: any) => {
-      const codeNode = node as Node;
+    console.log(JSON.stringify(tree));
+    visit(tree, 'code', (node, index, parent) => {
+      const codeNode = node;
       if (
         codeNode.type === 'code' &&
         (codeNode as Code).lang?.toLowerCase() === 'plantuml' &&
         parent &&
         index !== null
       ) {
-        promises.push(applyChange(codeNode as Code, index, parent));
+        console.log(JSON.stringify(parent));
+        promises.push(applyChange(codeNode as Code, index!, parent));
       }
     });
     await Promise.all(promises);
   };
-}
+};
+
+export default remarkPlantUml;

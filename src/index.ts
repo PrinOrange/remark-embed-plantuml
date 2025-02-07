@@ -1,3 +1,3 @@
-import remarkPlantuml from './plugin.js';
+import remarkPlantUml from './plugin.js';
 
-export {remarkPlantuml};
+export {remarkPlantUml};
