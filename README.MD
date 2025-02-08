@@ -9,7 +9,7 @@ This is a **Remark** plugin that allows you to embed **PlantUML** diagrams direc
 
 PlantUML requires a **Java Runtime Environment (JRE)**, but you do **not** need to install it manually. This package includes an integrated JRE and automatically executes PlantUML commands, making it easy to use out of the box.
 
-> **Note:** Since this package includes a bundled Java JRE and PlantUML JAR file, it is only compatible with a **Node.js** environment. It will not work in **browsers** or **Electron render processes**. Additionally, because building tools like **Webpack** and **Vite** cannot recognize Java binaries, this package will not function properly if bundled into a project.
+> **Note:** Since this package includes a bundled Java JRE and PlantUML JAR file, it is only compatible with a **Node.js** environment. It will not work in **browsers** or **Electron render processes**. Additionally, because building tools like **Webpack** and **Vite** cannot recognize Java binaries, this package will not function properly if bundled into a project. That means you can not use this in Next.js client-side code or other most of frontend integration frameworks as far. But we are trying to work out this problem now.
 
 ## Installation
 
