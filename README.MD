@@ -1,7 +1,9 @@
 # Remark Embed PlantUML
 
-> ⚠ **NOTE:**  
-> This package is in the early stages of development and requires user feedback and further investigation. If you encounter any issues, please [submit an issue](https://github.com/PrinOrange/remark-embed-plantuml/issues).
+[![Downloads][downloads-badge]][downloads]
+[![Size][size-badge]][size]
+
+> ⚠ **NOTE:** This package is in the early stages of development and requires user feedback and further investigation. If you encounter any issues, please [submit an issue](https://github.com/PrinOrange/remark-embed-plantuml/issues).
 
 This is a **Remark** plugin that allows you to embed **PlantUML** diagrams directly in your markdown documents. It scans all **PlantUML** code blocks in the markdown file and converts them into **Base64-encoded** images locally.
 
@@ -121,3 +123,10 @@ Test fixtures are generated and verified using **Linux**. Rendering results may 
 ## License
 
 [MIT](./LICENSE.MD) © [但为君故](https://github.com/PrinOrange)
+
+<!-- Definitions -->
+
+[downloads-badge]: https://img.shields.io/npm/dm/remark-embed-plantuml.svg
+[downloads]: https://www.npmjs.com/package/remark-embed-plantuml
+[size-badge]: https://img.shields.io/badge/dynamic/json?label=minzipped%20size&query=$.size.compressedSize&url=https://deno.bundlejs.com/?q=remark-embed-plantuml
+[size]: https://bundlejs.com/?q=remark-embed-plantuml
