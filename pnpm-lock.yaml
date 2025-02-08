@@ -26,6 +26,9 @@ importers:
       '@types/node':
         specifier: ^22.13.1
         version: 22.13.1
+      mdast-util-from-markdown:
+        specifier: ^2.0.2
+        version: 2.0.2
       prettier:
         specifier: ^3.4.2
         version: 3.4.2

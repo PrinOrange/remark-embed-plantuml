@@ -35,6 +35,7 @@
   "description": "A remark plugin that allows you render the PlantUML in the markdown document.",
   "devDependencies": {
     "@types/node": "^22.13.1",
+    "mdast-util-from-markdown": "^2.0.2",
     "prettier": "^3.4.2",
     "prettier-plugin-organize-imports": "^4.1.0",
     "remark-parse": "^11.0.0",
