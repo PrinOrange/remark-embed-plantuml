@@ -6,7 +6,7 @@ import remarkParse from 'remark-parse';
 import remarkStringify from 'remark-stringify';
 import {unified} from 'unified';
 import {fileURLToPath} from 'url';
-import {remarkPlantUml} from '../dist/index';
+import remarkEmbedPlantUml from '../dist/index';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,7 +25,7 @@ test('Basic PNG', async (t) => {
   );
   const processor = unified()
     .use(remarkParse)
-    .use(remarkPlantUml, {format: 'png'})
+    .use(remarkEmbedPlantUml, {format: 'png'})
     .use(remarkStringify);
   const transformed = await processor.process(inputContent);
   const actualContent = transformed.toString();
@@ -43,7 +43,7 @@ test('Basic SVG', async (t) => {
   );
   const processor = unified()
     .use(remarkParse)
-    .use(remarkPlantUml, {format: 'svg'})
+    .use(remarkEmbedPlantUml, {format: 'svg'})
     .use(remarkStringify);
   const transformed = await processor.process(inputContent);
   const actualContent = transformed.toString();
@@ -61,7 +61,7 @@ test('Dark PNG', async (t) => {
   );
   const processor = unified()
     .use(remarkParse)
-    .use(remarkPlantUml, {format: 'png', darkmode: true})
+    .use(remarkEmbedPlantUml, {format: 'png', darkmode: true})
     .use(remarkStringify);
   const transformed = await processor.process(inputContent);
   const actualContent = transformed.toString();
@@ -79,7 +79,7 @@ test('Dark SVG', async (t) => {
   );
   const processor = unified()
     .use(remarkParse)
-    .use(remarkPlantUml, {format: 'svg', darkmode: true})
+    .use(remarkEmbedPlantUml, {format: 'svg', darkmode: true})
     .use(remarkStringify);
   const transformed = await processor.process(inputContent);
   const actualContent = transformed.toString();
